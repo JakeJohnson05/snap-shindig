@@ -5,7 +5,7 @@
 
 # only for dev while i figure out how use .env in native
 # TODO: Figure out how to use .env to hide sensitive data
-firebase.js
+/firebase.js
 
 # dependencies
 /node_modules
