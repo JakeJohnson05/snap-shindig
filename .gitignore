@@ -3,6 +3,10 @@
 /tmp
 /out-tsc
 
+# only for dev while i figure out how use .env in native
+# TODO: Figure out how to use .env to hide sensitive data
+firebase.js
+
 # dependencies
 /node_modules
 
@@ -42,8 +46,7 @@ testem.log
 Thumbs.db
 /.env
 
-node_modules/**/*
-.expo/*
+/.expo
 npm-debug.*
 *.jks
 *.p8
