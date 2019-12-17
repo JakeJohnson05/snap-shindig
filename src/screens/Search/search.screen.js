@@ -2,10 +2,7 @@ import React from 'react';
 import { Text, View } from 'react-native';
 
 export class SearchScreen extends React.Component {
-
-  static navigationOpts = {
-    title: 'Search'
-  }
+  static navigationOptions = { title: 'Search' }
 
   render() {
     return (

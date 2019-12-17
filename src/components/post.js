@@ -4,6 +4,8 @@ import { StyleSheet, Text, View, Image, Dimensions } from 'react-native';
 export default class Post extends Component {
   render() {
     const { key: imageUri, caption, comments, likes, user } = this.props.postData;
+
+    if (!user) return null;
     return (
       <View style={styles.post}>
         <View style={styles.header}>

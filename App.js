@@ -1,14 +1,18 @@
 import React from 'react';
-import { StyleSheet, View } from 'react-native';
+import { StyleSheet, View, Platform, StatusBar } from 'react-native';
 import { Asset } from 'expo-asset';
 import { AppLoading } from 'expo';
 import * as Font from 'expo-font';
 import { AntDesign } from '@expo/vector-icons';
 
-import AppContainer from './src/navigation/TabNavigator';
+import { auth } from './firebaseConfig';
+
+import AppContainer from './src/navigation/tab.navigator';
+import LoginContainer from './src/navigation/login.navigator';
 
 export default class App extends React.Component {
-  state = { isReady: false }
+  state = { isReady: false, auth: false }
+  authStateObs;
 
   render() {
     if (!this.state.isReady) {
@@ -23,11 +27,26 @@ export default class App extends React.Component {
 
     return (
       <View style={styles.container}>
-        <AppContainer />
+        {Platform.OS === 'ios' && <StatusBar barStyle="light-content" />}
+        {this.state.auth ? <AppContainer /> : <LoginContainer />}
       </View>
     );
   }
 
+  componentDidMount() {
+    if (!this.authStateObs) this.authStateObs = auth.onAuthStateChanged(user => {
+      this.setState({ auth: !!user });
+    });
+  }
+  
+  componentWillUnmount() {
+    if (this.authStateObs) {
+      this.auth;
+      this.setState({ auth: false });
+      this.authStateObs = undefined;
+    }
+  }
+  
   async _cacheResourcesAsync() {
     return Promise.all([
       Asset.loadAsync([

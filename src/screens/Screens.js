@@ -1,9 +1,13 @@
-import { HomeScreen } from './Home/HomeScreen';
-import { ProfileScreen } from './Profile/ProfileScreen';
-import { SearchScreen } from './Search/SearchScreen';
+import { HomeScreen } from './Home/home.screen';
+import { ProfileScreen } from './Profile/profile.screen';
+import { SearchScreen } from './Search/search.screen';
+import { LoginScreen } from './Login/login.screen';
+import { RegisterScreen } from './Login/register.screen';
 
 export {
 	HomeScreen,
 	ProfileScreen,
-	SearchScreen
+	SearchScreen,
+	LoginScreen,
+	RegisterScreen
 }

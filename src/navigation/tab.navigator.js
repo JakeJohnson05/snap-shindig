@@ -5,39 +5,32 @@ import { createBottomTabNavigator, BottomTabBar } from 'react-navigation-tabs';
 import { AntDesign } from '@expo/vector-icons';
 
 import COLORS from 'snapshindig/assets/colors';
-import { HomeScreen, ProfileScreen, SearchScreen } from '../screens/Screens';
+
+import ProfileStack from './profile.navigator';
+import HomeStack from './home.navigator';
+import SearchStack from './search.navigator';
 
 /** Stores the icons for each of the route names */
 const iconRefs = { Search: 'search1', Profile: 'user', Home: 'home' }
 /** Renders the icon for a tab bar option */
 class BottomTabBarIcon extends React.Component {
-  render() {
-    const { color, route } = this.props;
-
-    return (
-      <View style={styles.tabBarIcon}>
-        <AntDesign name={iconRefs[route]} size={30} color={color} />
-      </View>
-    )
-  }
+  render = () => (
+    <View>
+      <AntDesign name={iconRefs[this.props.route]} size={30} color={this.props.color} />
+    </View>
+  );
 }
 
 /** The navigator for the bottom tab which is constantly visible  */
 const BottomTabNavigator = createBottomTabNavigator({
-  Search: {
-    screen: SearchScreen, navigationOptions: SearchScreen.navigationOpts
-  },
-  Home: {
-    screen: HomeScreen, navigationOptions: HomeScreen.navigationOpts
-  },
-  Profile: {
-    screen: ProfileScreen, navigationOptions: ProfileScreen.navigationOpts
-  }
+  Search: { screen: SearchStack },
+  Home: { screen: HomeStack },
+  Profile: { screen: ProfileStack }
 }, {
+  initialRouteName: 'Home',
   defaultNavigationOptions: ({ navigation }) => ({
     tabBarIcon: ({ tintColor }) => <BottomTabBarIcon route={navigation.state.routeName} color={tintColor} />
   }),
-  initialRouteName: 'Home',
   tabBarOptions: {
     activeTintColor: COLORS.blue,
     inactiveTintColor: COLORS.grayLight,
@@ -65,8 +58,7 @@ const styles = StyleSheet.create({
     },
     shadowOpacity: 1,
     shadowRadius: 2
-  },
-  tabBarIcon: {}
+  }
 });
 
 
