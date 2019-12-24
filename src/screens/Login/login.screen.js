@@ -1,16 +1,15 @@
 import React from 'react';
 import { StyleSheet, View, Text, TextInput, Button } from 'react-native';
 
+import COLORS from 'snapshindig/assets/colors';
 // import { auth } from '../../../firebaseConfig';
 import { auth } from 'snapshindig/firebaseConfig';
 
 import SnapShindigLogo from 'snapshindig/src/components/logo';
-import COLORS from 'snapshindig/assets/colors';
 
 export class LoginScreen extends React.Component {
 	static navigationOptions = { title: 'Log In', headerBackTitle: 'Log In', headerTruncatedBackTitle: 'Log In' }
-
-	state = { email: '', password: '', invalid: false, invalidCredentials: false }
+	state = { email: '', password: '', invalidCredentials: false }
 
 	render = () => (
 		<View style={styles.container}>
@@ -30,16 +29,15 @@ export class LoginScreen extends React.Component {
 	);
 
 	login() {
-		auth.signInWithEmailAndPassword(this.state.email, this.state.password).catch(err => {
-			err && this.setState({ invalidCredentials: true })
-		});
+		const { email, password } = this.state;
+		auth.signInWithEmailAndPassword(email, password).catch(err => err && this.setState({ invalidCredentials: true }));
 	}
 }
 
 class InvalidCredentials extends React.Component {
 	render = () => (
 		<View style={styles.invalidCredentials}>
-			<Text style={styles.invalidCredentialsText}>Invalid Email or Password</Text>
+			<Text style={styles.invalidCredentialsText}>Invalid Email or Password.</Text>
 		</View>
 	);
 }

@@ -1,8 +1,7 @@
 import React from 'react';
 import { FlatList, View } from 'react-native';
 
-import { posts, storage, getUserData } from '../../../firebaseConfig';
-// import { posts, storage, getUserData } from 'snapshindig/firebaseConfig';
+import { posts, storage, Database } from '../../../firebaseConfig';
 import Post from 'snapshindig/src/components/post';
 
 export class HomeScreen extends React.Component {
@@ -15,11 +14,10 @@ export class HomeScreen extends React.Component {
     </View>
   );
 
-
   componentDidMount() {
-    posts.get().then(postsSnapshot => {
+    posts.get().then(postsSnap => {
       let posts = [];
-      postsSnapshot.forEach(post => post.data().imageRef.includes('postImages/') && posts.push(Object.assign(post.data(), { id: post.id })));
+      postsSnap.forEach(post => post.data().imageRef.includes('postImages/') && posts.push(Object.assign(post.data(), { id: post.id })));
       this._loadPosts(posts);
     }).catch(err => console.error('HomeScreen.componentDidMount', err))
   }
@@ -27,7 +25,8 @@ export class HomeScreen extends React.Component {
   async _loadPosts(posts) {
     for (let post of posts) {
       post.key = await storage.ref(post.imageRef).getDownloadURL();
-      post.user = await getUserData(post.userId);
+      // post.user = await this.Database.getUserData(post.userId);
+      post.user = await Database.getUserData(post.userId);
     }
     this.setState({ posts })
   }
