@@ -2,10 +2,10 @@ import React from 'react';
 import { Text, View, Button, StyleSheet, FlatList, Image, Dimensions } from 'react-native';
 
 import { auth, posts, getUserData, storage } from '../../../firebaseConfig';
+// import { auth, posts, getUserData, storage } from 'snapshindig/firebaseConfig';
 
 export class ProfileScreen extends React.Component {
   static navigationOptions = { title: 'Profile' }
-
   state = { user: undefined, posts: undefined }
 
   render() {
@@ -36,7 +36,7 @@ export class ProfileScreen extends React.Component {
           }
         }))).then(posts => {
           posts.unshift({ key: 'addNew' });
-          this.setState({ posts })
+          this.setState({ posts });
         })
     })
   }

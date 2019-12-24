@@ -1,7 +1,8 @@
 import React from 'react';
 import { StyleSheet, View, Text, TextInput, Button } from 'react-native';
 
-import { auth } from '../../../firebaseConfig';
+// import { auth } from '../../../firebaseConfig';
+import { auth } from 'snapshindig/firebaseConfig';
 
 import SnapShindigLogo from 'snapshindig/src/components/logo';
 import COLORS from 'snapshindig/assets/colors';

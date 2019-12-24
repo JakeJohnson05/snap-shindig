@@ -2,11 +2,11 @@ import React from 'react';
 import { FlatList, View } from 'react-native';
 
 import { posts, storage, getUserData } from '../../../firebaseConfig';
+// import { posts, storage, getUserData } from 'snapshindig/firebaseConfig';
 import Post from 'snapshindig/src/components/post';
 
 export class HomeScreen extends React.Component {
   static navigationOptions = { title: 'Snap Shindig', headerBackTitle: 'Home', headerTruncatedBackTitle: 'Home' }
-
   state = { posts: [] }
 
   render = () => (

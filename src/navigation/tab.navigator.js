@@ -12,14 +12,6 @@ import SearchStack from './search.navigator';
 
 /** Stores the icons for each of the route names */
 const iconRefs = { Search: 'search1', Profile: 'user', Home: 'home' }
-/** Renders the icon for a tab bar option */
-class BottomTabBarIcon extends React.Component {
-  render = () => (
-    <View>
-      <AntDesign name={iconRefs[this.props.route]} size={30} color={this.props.color} />
-    </View>
-  );
-}
 
 /** The navigator for the bottom tab which is constantly visible  */
 const BottomTabNavigator = createBottomTabNavigator({
@@ -39,7 +31,14 @@ const BottomTabNavigator = createBottomTabNavigator({
   tabBarComponent: props => <TabBarComponent {...props} />
 });
 
+/** Creates the BottomTabBar with the style and props */
 const TabBarComponent = props => <BottomTabBar {...props} style={styles.tabBarComponent} />
+/** Renders the icon for a tab bar option */
+class BottomTabBarIcon extends React.Component {
+  render = () => <View>
+    <AntDesign name={iconRefs[this.props.route]} size={30} color={this.props.color} />
+  </View>
+}
 
 const styles = StyleSheet.create({
   tabBarComponent: {
@@ -52,14 +51,13 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 5,
     borderTopLeftRadius: 5,
     shadowColor: COLORS.grayLight,
+    shadowOpacity: 1,
+    shadowRadius: 2,
     shadowOffset: {
       height: 0,
       width: 0
-    },
-    shadowOpacity: 1,
-    shadowRadius: 2
+    }
   }
 });
-
 
 export default createAppContainer(BottomTabNavigator);
