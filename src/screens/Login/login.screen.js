@@ -1,8 +1,8 @@
 import React from 'react';
 import { StyleSheet, View, Text, TextInput, Button } from 'react-native';
 
+import ENV_VARS from '../../../env';
 import COLORS from 'snapshindig/assets/colors';
-// import { auth } from '../../../firebaseConfig';
 import { auth } from 'snapshindig/firebaseConfig';
 
 import SnapShindigLogo from 'snapshindig/src/components/logo';
@@ -14,24 +14,28 @@ export class LoginScreen extends React.Component {
 	render = () => (
 		<View style={styles.container}>
 			<SnapShindigLogo />
+
 			<View style={styles.textContainer}>
 				{this.state.invalidCredentials && <InvalidCredentials />}
 				<TextInput style={styles.textInput} placeholder="Email" value={this.state.email} onChangeText={email => this.setState({ email })} autoCapitalize="none" textContentType="emailAddress" autoCompleteType="email" />
 				<TextInput style={styles.textInput} placeholder="Password" value={this.state.password} onChangeText={password => this.setState({ password })} autoCapitalize="none" textContentType="password" autoCompleteType="password" secureTextEntry />
 			</View>
+
 			<View style={styles.bottomButtons}>
 				<View style={styles.loginButtonContainer}>
 					<Button title="Log In" color={COLORS.blue} onPress={() => this.login()} disabled={!this.state.email || !this.state.password} />
 				</View>
+				
+				{/* TODO: Remove this before production */}
+				<View style={styles.loginButtonContainer}><Button title="Dev Log In" color={COLORS.blue} onPress={() => this.devLogin()} /></View>
+
 				<Button title="Don't have an account? Sign Up!" onPress={() => this.props.navigation.navigate('Register')} color={COLORS.blue} />
 			</View>
 		</View>
 	);
 
-	login() {
-		const { email, password } = this.state;
-		auth.signInWithEmailAndPassword(email, password).catch(err => err && this.setState({ invalidCredentials: true }));
-	}
+	login = () => auth.signInWithEmailAndPassword(this.state.email, this.state.password).catch(err => err && this.setState({ invalidCredentials: true }));
+	devLogin = () => auth.signInWithEmailAndPassword(ENV_VARS.devCreds.email, ENV_VARS.devCreds.pass).catch(err => err && this.setState({ invalidCredentials: true }));
 }
 
 class InvalidCredentials extends React.Component {

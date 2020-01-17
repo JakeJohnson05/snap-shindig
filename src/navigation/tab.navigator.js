@@ -19,7 +19,9 @@ const BottomTabNavigator = createBottomTabNavigator({
   Home: { screen: HomeStack },
   Profile: { screen: ProfileStack }
 }, {
-  initialRouteName: 'Home',
+  // TODO: Make the default 'Home'
+  initialRouteName: 'Profile',
+  // initialRouteName: 'Home',
   defaultNavigationOptions: ({ navigation }) => ({
     tabBarIcon: ({ tintColor }) => <BottomTabBarIcon route={navigation.state.routeName} color={tintColor} />
   }),
@@ -35,9 +37,11 @@ const BottomTabNavigator = createBottomTabNavigator({
 const TabBarComponent = props => <BottomTabBar {...props} style={styles.tabBarComponent} />
 /** Renders the icon for a tab bar option */
 class BottomTabBarIcon extends React.Component {
-  render = () => <View>
-    <AntDesign name={iconRefs[this.props.route]} size={30} color={this.props.color} />
-  </View>
+  render = () => (
+    <View>
+      <AntDesign name={iconRefs[this.props.route]} size={30} color={this.props.color} />
+    </View>
+  );
 }
 
 const styles = StyleSheet.create({

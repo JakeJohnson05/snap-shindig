@@ -38,7 +38,7 @@ export default class App extends React.Component {
       this.setState({ auth: !!user });
     });
   }
-  
+
   componentWillUnmount() {
     if (this.authStateObs) {
       this.auth;
@@ -46,18 +46,16 @@ export default class App extends React.Component {
       this.authStateObs = undefined;
     }
   }
-  
-  async _cacheResourcesAsync() {
-    return Promise.all([
-      Asset.loadAsync([
-        require('./assets/icon.png'),
-        require('./assets/splash.png')
-      ]),
-      Font.loadAsync({
-        ...AntDesign.font
-      })
-    ]);
-  }
+
+  _cacheResourcesAsync = () => Promise.all([
+    Asset.loadAsync([
+      require('./assets/icon.png'),
+      require('./assets/splash.png')
+    ]),
+    Font.loadAsync({
+      ...AntDesign.font
+    })
+  ]);
 }
 
 const styles = StyleSheet.create({

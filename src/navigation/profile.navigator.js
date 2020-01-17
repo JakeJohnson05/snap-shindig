@@ -9,8 +9,8 @@ const ProfileNavigator = createStackNavigator(
 	{
 		ProfileScreen: { screen: ProfileScreen }
 	}, {
-	initialRouteName: 'ProfileScreen',
-	defaultNavigationOptions
+		initialRouteName: 'ProfileScreen',
+		defaultNavigationOptions
 })
 
 

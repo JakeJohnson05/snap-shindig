@@ -1,45 +1,43 @@
-import React, { Component } from 'react';
+import React from 'react';
 import { StyleSheet, Text, View, Image, Dimensions } from 'react-native';
 
-export default class Post extends Component {
-  render() {
-    const { key: imageUri, caption, comments, likes, user } = this.props.postData;
+export class PostComponent extends React.Component {
+  render = () => (
+    <View style={styles.post}>
+      {!this.props.hideHeader && this.props.data.user && <PostHeader user={this.props.data.user} />}
 
-    if (!user) return null;
-    return (
-      <View style={styles.post}>
-        <View style={styles.header}>
-          <View style={styles.userImage}>
-            <Image source={{ uri: user.avatarUri }} style={styles.userImage} />
-          </View>
-          <View style={styles.username}>
-            <Text>{user.username}</Text>
-          </View>
-        </View>
-        <View>
-          <Image source={{ uri: imageUri }} style={styles.image} />
-        </View>
-        <View>
-          <Text>{caption}</Text>
-        </View>
+      <Image source={{ uri: this.props.data.key }} style={styles.image} />
+      <View>
+        <Text>{this.props.data.caption}</Text>
       </View>
-    );
-  }
+
+    </View>
+  );
 }
 
-
-
-
+export const PostHeader = ({ user }) => (
+  <View style={styles.header}>
+    <View style={styles.userImage}>
+      <Image source={user.avatarSource} style={styles.userImage} />
+    </View>
+    <View style={styles.username}>
+      <Text>{user.username}</Text>
+    </View>
+  </View>
+);
 
 const styles = StyleSheet.create({
   post: {
-    flex: 1
+    flex: 1,
+    flexDirection: 'column',
+    flexWrap: 'nowrap',
+    marginBottom: 12
   },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginTop: 4,
-    marginBottom: 4
+    paddingVertical: 4,
+    backgroundColor: '#FFF'
   },
   userImage: {
     height: 40,

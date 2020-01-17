@@ -1,55 +1,74 @@
 import React from 'react';
 import { Text, View, Button, StyleSheet, FlatList, Image, Dimensions } from 'react-native';
 
-import { auth, posts, storage, Database } from '../../../firebaseConfig';
+import { Loading } from 'snapshindig/src/components/loading';
+import COLORS from 'snapshindig/assets/colors';
+
+import { auth, appDatabase, Post, User } from '../../../firebaseConfig';
 
 export class ProfileScreen extends React.Component {
-  static navigationOptions = { title: 'Profile' }
-  state = { user: undefined, posts: undefined }
+  static navigationOptions = ({ navigation }) => ({
+    title: navigation.getParam('username', 'Profile')
+  });
 
-  render = () => (
+  /** @type {{ user: User; posts: Post[]; }} */
+  state = { user: undefined, posts: undefined }
+  /** @type {Function[]} The function for canceling subscriptions */
+  unmountSubscriptions = [];
+
+  render = () => !this.state.user ? <Loading /> : (
     <View style={{ flex: 1 }}>
-      <Text>Profile!</Text>
-      <Button title="Log Out" onPress={_ => auth.signOut()} />
-      <View style={styles.postsContainer}>
-        <FlatList numColumns={3} data={this.state.posts} renderItem={({ item }) => <MiniPost imageUri={item.key} />} />
-      </View>
+      <FlatList
+        numColumns={3}
+        data={this.state.posts}
+        ListHeaderComponent={<UserProfile user={this.state.user} />}
+        renderItem={({ item: { key: uri } }) => <MiniPost imageUri={{ uri }} />}
+      />
     </View>
   );
 
-  componentDidMount = () => auth.onAuthStateChanged(userSnap => {
-    if (!userSnap) return this.setState({ user: undefined, posts: [] });
-    // else return this.Database.getUserData(userSnap.uid).then(user => {
-    else return Database.getUserData(userSnap.uid).then(user => {
-      if (!user) return this.setState({ user: undefined, posts: [] });
-      this.setState({ user, posts: [] });
-      return user.id;
-    }).then(userId => posts.where('userId', '==', userId).get())
-      .then(posts => Promise.all(posts.docs.map(async nextPost => {
-        if (nextPost.exists && nextPost.data().imageRef.includes('postImages/')) {
-          let post = nextPost.data();
-          post.key = await storage.ref(post.imageRef).getDownloadURL();
-          return post;
-        }
-      }))).then(posts => {
-        posts.unshift({ key: 'addNew' });
-        this.setState({ posts });
-      })
-  });
+  componentDidMount = () => this.unmountSubscriptions = [
+    auth.onAuthStateChanged(userSnap => !userSnap ? this.setState({ user: new User(), posts: [] }) : appDatabase.getUserData(userSnap.uid).then(user => {
+      if (!user) throw this.setState({ user: new User(), posts: [] });
+      this.props.navigation.setParams({ username: user.username.toUpperCase() });
+      this.setState({ user, posts: [{ key: 'addNew' }] });
+      return appDatabase.getUsersPosts(user);
+    }).then(posts => posts.sort(Post.sortByDate)).then(posts => this._loadPosts(posts))
+      .catch(err => console.error('ProfileScreen.componentDidMount: ' + err)))
+  ];
+
+  /** @param {Post[]} posts */
+  async _loadPosts(posts) {
+    for (let post of posts) {
+      await post.keyDownload();
+      this.setState(prevState => ({
+        posts: [...prevState.posts, post]
+      }));
+    }
+  }
+  componentWillUnmount = () => this.unmountSubscriptions.forEach(unsubscribe => unsubscribe());
 }
 
-class MiniPost extends React.Component {
-  render() {
-    if (this.props.imageUri === 'addNew') return (
-      <Image source={require('../../../assets/add.png')} style={styles.image} />
-    );
-    return (
-      <Image source={{ uri: this.props.imageUri }} style={styles.image} />
-    );
-  }
-}
+const UserProfile = ({ user }) => (
+  <View style={styles.profileContainer}>
+    <Text>{JSON.stringify(user)}</Text>
+    <Image source={user.avatarSource} style={styles.userImage} />
+  </View>
+);
+const MiniPost = ({ imageUri }) => imageUri.uri == 'addNew' ? <Image source={Post.addPostImage} style={styles.image} /> : <Image source={imageUri} style={styles.image} />;
 
 const styles = StyleSheet.create({
+  profileContainer: {
+    borderBottomWidth: 2,
+    borderBottomColor: COLORS.gray
+  },
+  userImage: {
+    height: 40,
+    width: 40,
+    borderRadius: 20,
+    marginLeft: 4,
+    marginRight: 8
+  },
   postsContainer: {
   },
   image: {

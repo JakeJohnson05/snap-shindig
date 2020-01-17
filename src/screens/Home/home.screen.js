@@ -1,33 +1,39 @@
 import React from 'react';
-import { FlatList, View } from 'react-native';
+import { View, SectionList } from 'react-native';
 
-import { posts, storage, Database } from '../../../firebaseConfig';
-import Post from 'snapshindig/src/components/post';
+import { posts, Post } from '../../../firebaseConfig';
+import { PostComponent, PostHeader } from 'snapshindig/src/components/post';
+import { Loading } from 'snapshindig/src/components/loading';
 
 export class HomeScreen extends React.Component {
   static navigationOptions = { title: 'Snap Shindig', headerBackTitle: 'Home', headerTruncatedBackTitle: 'Home' }
-  state = { posts: [] }
+  state = { posts: [], loading: true }
 
-  render = () => (
+  render = () => this.state.loading ? <Loading /> : (
     <View style={{ flex: 1 }}>
-      <FlatList data={this.state.posts} renderItem={({ item }) => <Post postData={item} />} />
+      <SectionList
+        sections={this.state.posts}
+        renderSectionHeader={({ section: { user } }) => <PostHeader user={user} />}
+        renderItem={({ item }) => <PostComponent data={item} hideHeader={true} />}
+      />
     </View>
   );
 
-  componentDidMount() {
-    posts.get().then(postsSnap => {
-      let posts = [];
-      postsSnap.forEach(post => post.data().imageRef.includes('postImages/') && posts.push(Object.assign(post.data(), { id: post.id })));
-      this._loadPosts(posts);
-    }).catch(err => console.error('HomeScreen.componentDidMount', err))
-  }
+  componentDidMount = () => posts.get().then(postsSnap => {
+    let posts = [];
+    postsSnap.forEach(post => post.exists && post.data().imageRef.includes('postImages/') && posts.push(new Post(Object.assign(post.data(), { id: post.id }))));
+    this._loadPosts(posts);
+  }).catch(err => console.error('HomeScreen.componentDidMount: ', err));
 
+  /** @param {Post[]} posts*/
   async _loadPosts(posts) {
     for (let post of posts) {
-      post.key = await storage.ref(post.imageRef).getDownloadURL();
-      // post.user = await this.Database.getUserData(post.userId);
-      post.user = await Database.getUserData(post.userId);
+      await Promise.all([post.keyDownload(), post.userDownload()]);
+
+      this.setState(prevState => ({
+        loading: false,
+        posts: [...prevState.posts, { user: post.user, data: [post] }]
+      }));
     }
-    this.setState({ posts })
   }
 }

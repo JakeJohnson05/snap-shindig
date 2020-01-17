@@ -1,27 +1,25 @@
-import React, { Component } from 'react';
+import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
 import COLORS from 'snapshindig/assets/colors';
 
-export default class SnapShindigLogo extends Component {
-	render() {
-		return (
-			<View>
-				<View style={styles.logoContainer}>
-					<View style={styles.textContainer}>
-						<View style={styles.textContainerTop}>
-							<Text style={styles.text}>Snap</Text>
-						</View>
+export default class SnapShindigLogo extends React.Component {
+	render = () => (
+		<View>
+			<View style={styles.logoContainer}>
+				<View style={styles.textContainer}>
+					<View style={styles.textContainerTop}>
+						<Text style={styles.text}>Snap</Text>
 					</View>
-					<View style={styles.textContainer}>
-						<View style={styles.textContainerBottom}>
-							<Text style={styles.text}>Shindig</Text>
-						</View>
+				</View>
+				<View style={styles.textContainer}>
+					<View style={styles.textContainerBottom}>
+						<Text style={styles.text}>Shindig</Text>
 					</View>
 				</View>
 			</View>
-		);
-	}
+		</View>
+	);
 }
 
 const styles = StyleSheet.create({
