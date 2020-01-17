@@ -1,12 +1,15 @@
 import React from 'react';
 import { StyleSheet, Text, View, Image, Dimensions } from 'react-native';
 
+import COLORS from 'snapshindig/assets/colors';
+
 export class PostComponent extends React.Component {
   render = () => (
     <View style={styles.post}>
       {!this.props.hideHeader && this.props.data.user && <PostHeader user={this.props.data.user} />}
 
-      <Image source={{ uri: this.props.data.key }} style={styles.image} />
+      <Image source={{ uri: this.props.data.key, width: 20, height: 20 }} style={styles.image} />
+      
       <View>
         <Text>{this.props.data.caption}</Text>
       </View>
@@ -50,6 +53,7 @@ const styles = StyleSheet.create({
 
   },
   image: {
+    backgroundColor: COLORS.grayVeryLight,
     width: Dimensions.get('window').width,
     height: undefined,
     aspectRatio: 1

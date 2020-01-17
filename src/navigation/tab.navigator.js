@@ -19,9 +19,7 @@ const BottomTabNavigator = createBottomTabNavigator({
   Home: { screen: HomeStack },
   Profile: { screen: ProfileStack }
 }, {
-  // TODO: Make the default 'Home'
-  initialRouteName: 'Profile',
-  // initialRouteName: 'Home',
+  initialRouteName: 'Profile' || 'Home',
   defaultNavigationOptions: ({ navigation }) => ({
     tabBarIcon: ({ tintColor }) => <BottomTabBarIcon route={navigation.state.routeName} color={tintColor} />
   }),
@@ -46,21 +44,14 @@ class BottomTabBarIcon extends React.Component {
 
 const styles = StyleSheet.create({
   tabBarComponent: {
-    borderTopColor: COLORS.blue,
-    borderRightColor: COLORS.blue,
-    borderLeftColor: COLORS.blue,
+    borderTopColor: COLORS.blueLight,
+    borderRightColor: COLORS.blueLight,
+    borderLeftColor: COLORS.blueLight,
     borderTopWidth: 1,
-    borderRightWidth: 1,
-    borderLeftWidth: 1,
-    borderTopRightRadius: 5,
-    borderTopLeftRadius: 5,
-    shadowColor: COLORS.grayLight,
-    shadowOpacity: 1,
+    shadowColor: COLORS.grayDark,
+    shadowOpacity: .8,
     shadowRadius: 2,
-    shadowOffset: {
-      height: 0,
-      width: 0
-    }
+    shadowOffset: { height: 0, width: 0 }
   }
 });
 

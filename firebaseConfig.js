@@ -40,9 +40,6 @@ class FirebaseApp {
 		if (!postSnapShot.exists) return null;
 		let post = new Post(Object.assign(post.data(), { id: post.id }));
 
-		// post.key = await storage.ref(post.imageRef).getDownloadURL();
-		// post.user = await this.getUserData(post.userId);
-
 		return post;
 	}
 
@@ -52,6 +49,18 @@ class FirebaseApp {
 	 * @return {Promise<User>} User matching id else null
 	 */
 	getUserData = async userId => {
+		return new User({
+			avatarRef: "avatars/20191019_144835.jpg",
+			'avatarUri': undefined,
+			'bio': "Hey There!",
+			'createdAt': {
+				'nanoseconds': NaN,
+				'seconds': 1576206540,
+			},
+			'id': "jeUp7b41uLZwzdcLwG1sTLOANPh2",
+			'name': "Jake Johnson",
+			'username': "jakejohnson",
+		});
 		if (!userId) return null;
 		// Check if the user has already been requested
 		let user = this.usersBS.value.find(({ id }) => id === userId);
@@ -131,6 +140,7 @@ export class User extends Model {
 
 	/** Get the value in the correct format for the <*Image source=*{**Insert here**} /> */
 	get avatarSource() { return this.avatarUri ? ({ uri: this.avatarUri }) : require('snapshindig/assets/defaultProfile.png') }
+	static get defaultProfile() { return require('snapshindig/assets/defaultProfile.png') }
 }
 
 /** The Post object stored in the database */
