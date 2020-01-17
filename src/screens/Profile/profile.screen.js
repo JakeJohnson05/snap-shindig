@@ -51,7 +51,6 @@ export class ProfileScreen extends React.Component {
 
 const UserProfile = ({ user }) => (
   <View style={styles.profileContainer}>
-    <Text>{JSON.stringify(user)}</Text>
     <Image source={user.avatarSource} style={styles.userImage} />
   </View>
 );
