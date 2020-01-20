@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, SectionList } from 'react-native';
 
-import { posts, Post } from '../../../firebaseConfig';
+import { appDatabase, Post } from '../../../firebaseConfig';
 import { PostComponent, PostHeader } from 'snapshindig/src/components/post';
 import { Loading } from 'snapshindig/src/components/loading';
 
@@ -19,17 +19,18 @@ export class HomeScreen extends React.Component {
     </View>
   );
 
-  // componentDidMount = () => posts.get().then(postsSnap => {
-  //   let posts = [];
-  //   postsSnap.forEach(post => post.exists && post.data().imageRef.includes('postImages/') && posts.push(new Post(Object.assign(post.data(), { id: post.id }))));
-  //   this._loadPosts(posts);
-  // }).catch(err => console.error('HomeScreen.componentDidMount: ', err));
+  componentDidMount = () => appDatabase.getAllPosts().get().then(postsSnaps => {
+    console.log('HomeScreen.componentDidMount', postsSnaps)
+    let posts = [];
+    postsSnaps.forEach(post => post.exists && post.data().imageRef.includes('postImages/') && posts.push(new Post(Object.assign({ id: post.id }, post.data()))));
+    this._loadPosts(posts);
+  }).catch(err => console.error('HomeScreen.componentDidMount: ', err));
 
   /** @param {Post[]} posts*/
   async _loadPosts(posts) {
     for (let post of posts) {
       await Promise.all([post.keyDownload(), post.userDownload()]);
-
+      
       this.setState(prevState => ({
         loading: false,
         posts: [...prevState.posts, { user: post.user, data: [post] }]

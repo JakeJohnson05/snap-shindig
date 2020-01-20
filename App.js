@@ -34,17 +34,15 @@ export default class App extends React.Component {
   }
 
   componentDidMount() {
-    if (!this.authStateObs) this.authStateObs = auth.onAuthStateChanged(user => {
-      this.setState({ auth: !!user });
-    });
+    if (!this.authStateObs) this.authStateObs = auth.onAuthStateChanged(user => this.setState({ auth: !!user }));
   }
 
   componentWillUnmount() {
     if (this.authStateObs) {
-      this.auth;
-      this.setState({ auth: false });
+      this.authStateObs();
       this.authStateObs = undefined;
     }
+    this.setState({ auth: false });
   }
 
   _cacheResourcesAsync = () => Promise.all([

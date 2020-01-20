@@ -8,7 +8,7 @@ export class PostComponent extends React.Component {
     <View style={styles.post}>
       {!this.props.hideHeader && this.props.data.user && <PostHeader user={this.props.data.user} />}
 
-      <Image source={{ uri: this.props.data.key, width: 20, height: 20 }} style={styles.image} />
+      <Image source={this.props.data.imageSource} style={styles.image} />
       
       <View>
         <Text>{this.props.data.caption}</Text>

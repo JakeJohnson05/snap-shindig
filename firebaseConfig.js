@@ -1,23 +1,29 @@
-import Firebase from 'firebase/app';
-import { BehaviorSubject } from 'rxjs';
 // Import desired Firebase products
+import Firebase from 'firebase/app';
 import 'firebase/auth';
 import 'firebase/firestore';
 import 'firebase/storage';
-
+// Other imports
+import { BehaviorSubject } from 'rxjs';
+// Environment variables
 import ENV_VARS from './env';
+// Test data for development
+import TEST_DATA from './test-data/database';
+
+const storage = TEST_DATA.storage;
+const users = TEST_DATA.usersCollection;
+export const posts = TEST_DATA.postsCollection;
+export const auth = TEST_DATA.auth;
 
 // Initialize the Firebase app if none other exist
-if (!Firebase.apps.length) Firebase.initializeApp(ENV_VARS.firebaseOptions);
+// if (!Firebase.apps.length) Firebase.initializeApp(ENV_VARS.firebaseOptions);
 
-const firestore = Firebase.firestore();
-
-export const posts = firestore.collection('posts').orderBy('createdAt', 'desc');
-export const users = firestore.collection('users');
-export const auth = Firebase.auth();
-export const storage = Firebase.storage();
-export const createTimestamp = () => Firebase.firestore.Timestamp.fromDate(new Date());
-
+// const createTimestamp = () => Firebase.firestore.Timestamp.fromDate(new Date());
+// const firestore = Firebase.firestore();
+// const storage = Firebase.storage();
+// const users = firestore.collection('users');
+// export const posts = firestore.collection('posts');
+// export const auth = Firebase.auth();
 
 /** The Firebase app instance with custom configurations */
 class FirebaseApp {
@@ -28,20 +34,24 @@ class FirebaseApp {
 		this.usersBS = new BehaviorSubject([]);
 	}
 
+	/** Get the collection reference to all the posts ordered by date created desc */
+	getAllPosts = () => posts.orderBy('createdAt', 'desc');
+
 	/**
 	 * Get any post by its uid
 	 * @param {string}  postId
 	 * @return {Promise<Post>}
 	 */
-	getPost = async postId => {
-		if (!postId) return null;
+	getPost = postId => !postId ? null : posts.doc(postId).get().then(snapshot => !snapshot.exists ? null : new Post(Object.assign({ id: snapshot.id }, snapshot.data())))
+	// getPost = async postId => {
+	// 	if (!postId) return null;
 
-		let postSnapShot = await firestore.collection('posts').doc(postId).get();
-		if (!postSnapShot.exists) return null;
-		let post = new Post(Object.assign(post.data(), { id: post.id }));
+	// 	let postSnapShot = await posts.doc(postId).get();
+	// 	if (!postSnapShot.exists) return null;
+	// 	let post = new Post(Object.assign(post.data(), { id: post.id }));
 
-		return post;
-	}
+	// 	return post;
+	// }
 
 	/**
 	 * Get the database collection data about a user by the uid
@@ -49,18 +59,6 @@ class FirebaseApp {
 	 * @return {Promise<User>} User matching id else null
 	 */
 	getUserData = async userId => {
-		return new User({
-			avatarRef: "avatars/20191019_144835.jpg",
-			'avatarUri': undefined,
-			'bio': "Hey There!",
-			'createdAt': {
-				'nanoseconds': NaN,
-				'seconds': 1576206540,
-			},
-			'id': "jeUp7b41uLZwzdcLwG1sTLOANPh2",
-			'name': "Jake Johnson",
-			'username': "jakejohnson",
-		});
 		if (!userId) return null;
 		// Check if the user has already been requested
 		let user = this.usersBS.value.find(({ id }) => id === userId);
@@ -71,13 +69,13 @@ class FirebaseApp {
 			user = Object.assign({ id: user.id }, user.data());
 
 			// Add the users avatar uri if avatar path exists
-			if (user.avatarRef && user.avatarRef.includes('avatars/')) user.avatarUri = await storage.ref(user.avatarRef).getDownloadURL()/* .then(avatarUri => Object.assign({ avatarUri }, user)) */;
+			if (user.avatarRef && /^avatars\//.test(user.avatarRef)) user.avatarUri = await storage.ref(user.avatarRef).getDownloadURL();
 
 			user = new User(user);
 			// Push the new user to the local behavior subject
 			this.usersBS.value.push(user);
 		}
-		// return new User(user.bio, user.name, user.username, user.avatarUri, user.avatarRef);
+
 		return user;
 	}
 
@@ -86,9 +84,9 @@ class FirebaseApp {
 	 * @param {User}  user
 	 * @return {Promise<Post[]>}
 	 */
-	getUsersPosts = async user => !(user || user.id) ? [] : firestore.collection('posts').where('userId', '==', user.id).get().then(postSnaps => {
+	getUsersPosts = async user => !(user || user.id) ? [] : posts.where('userId', '==', user.id).get().then(postSnaps => {
 		let posts = [];
-		postSnaps.forEach(post => post.exists && post.data().imageRef.includes('postImages/') && posts.push(new Post(Object.assign({ user, id: post.id }, post.data()))));
+		postSnaps.forEach(post => post.exists && /^postImages\//.test(post.data().imageRef) && posts.push(new Post(Object.assign({ user, id: post.id }, post.data()))));
 		return posts;
 	}).catch(_ => []);
 }
@@ -139,7 +137,7 @@ export class User extends Model {
 	}
 
 	/** Get the value in the correct format for the <*Image source=*{**Insert here**} /> */
-	get avatarSource() { return this.avatarUri ? ({ uri: this.avatarUri }) : require('snapshindig/assets/defaultProfile.png') }
+	get avatarSource() { return this.avatarUri ? typeof this.avatarUri === 'number' ? this.avatarUri : ({ uri: this.avatarUri }) : User.defaultProfile }
 	static get defaultProfile() { return require('snapshindig/assets/defaultProfile.png') }
 }
 
@@ -172,8 +170,10 @@ export class Post extends Model {
 		this.user = (opts.user instanceof User && opts.user.id) ? opts.user : undefined;
 	}
 
+	get imageSource() { return typeof this.key === 'number' ? this.key : ({ uri: this.key }) }
+
 	async keyDownload(force = false) {
-		if (force || !this.key) this.key = await storage.ref(this.imageRef).getDownloadURL();
+		if ((force || !this.key) && typeof this.key !== 'number') this.key = await storage.ref(this.imageRef).getDownloadURL();
 		return this.key;
 	}
 
@@ -181,7 +181,6 @@ export class Post extends Model {
 		if (force || !this.user) this.user = await appDatabase.getUserData(this.userId);
 		return this.user;
 	}
-	// let [key, user] = await Promise.all([storage.ref(post.imageRef).getDownloadURL(), appDatabase.getUserData(post.userId)]);
 
 	/** Gets the image for the 'add post' picture */
 	static get addPostImage() { return require('snapshindig/assets/add.png') }
@@ -199,8 +198,8 @@ class Timestamp {
 
 	/** @param {number | {seconds: number}} seconds */
 	constructor(seconds = NaN) {
-		if (typeof seconds == "number") this.seconds = seconds;
-		else if (seconds && typeof seconds == "object" && typeof seconds.seconds == "number") this.seconds = seconds.seconds;
+		if (typeof seconds == 'number') this.seconds = seconds;
+		else if (seconds && typeof seconds == 'object' && typeof seconds.seconds == 'number') this.seconds = seconds.seconds;
 		else this.seconds = NaN;
 	}
 }
