@@ -7,9 +7,9 @@ import COLORS from 'snapshindig/assets/colors';
  */
 export default {
 	defaultNavigationOptions: {
-		headerStyle: { backgroundColor: COLORS.blue },
-		headerTitleStyle: { color: '#FFF' },
-		headerTintColor: '#FFF'
+		headerStyle: { backgroundColor: COLORS.blue, height: 40 },
+		headerTitleStyle: { color: '#FFF', fontSize: 20 },
+		headerTintColor: '#FFF',
 	},
 	headerBackTitleVisible: false
 }

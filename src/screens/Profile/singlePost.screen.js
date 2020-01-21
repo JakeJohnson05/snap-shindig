@@ -9,7 +9,7 @@ export class SinglePostScreen extends React.Component {
 
 	render = () => {
 		const post = this.props.navigation.getParam('post', undefined);
-		return post ? <PostComponent data={post} /> : (
+		return post ? <PostComponent {...this.props} data={post} /> : (
 			<View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
 				<Text style={{ fontSize: 20 }}>Post not found.</Text>
 			</View>

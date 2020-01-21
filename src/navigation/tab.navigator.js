@@ -42,14 +42,12 @@ class BottomTabBarIcon extends React.Component {
 
 const styles = StyleSheet.create({
   tabBarComponent: {
-    borderTopColor: COLORS.blueLight,
-    borderRightColor: COLORS.blueLight,
-    borderLeftColor: COLORS.blueLight,
+    borderTopColor: COLORS.blue,
     borderTopWidth: 1,
-    shadowColor: COLORS.grayDark,
-    shadowOpacity: .8,
-    shadowRadius: 2,
-    shadowOffset: { height: 0, width: 0 }
+    // shadowColor: COLORS.grayDark,
+    // shadowOpacity: .8,
+    // shadowRadius: 2,
+    // shadowOffset: { height: 0, width: 0 }
   }
 });
 

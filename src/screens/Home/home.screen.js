@@ -5,7 +5,7 @@ import { appDatabase, Post } from '../../../firebaseConfig';
 import { PostComponent, PostHeader, Loading } from 'snapshindig/src/components/components';
 
 export class HomeScreen extends React.Component {
-  static navigationOptions = { title: 'Snap Shindig' }
+  static navigationOptions = { title: 'SnapShindig' }
   state = { posts: [], loading: true }
 
   render = () => this.state.loading ? <Loading /> : (
@@ -22,7 +22,7 @@ export class HomeScreen extends React.Component {
     let posts = [];
     postsSnaps.forEach(post => post.exists && post.data().imageRef.includes('postImages/') && posts.push(new Post(Object.assign({ id: post.id }, post.data()))));
     this._loadPosts(posts);
-  }).catch(err => console.error('HomeScreen.componentDidMount: ', err));
+  }).catch(err => console.error('HomeScreen.componentDidMount:', err));
 
   /** @param {Post[]} posts*/
   async _loadPosts(posts) {

@@ -41,10 +41,10 @@ export class ProfileScreen extends React.Component {
   render = () => !this.state.isReady ? <Loading /> : <ProfileLayout {...this.props} user={this.state.user} posts={this.state.posts} />;
 
   componentDidMount() {
-    Promise.resolve(this.props.navigation.getParam('user', undefined))
+    Promise.resolve(this.props.navigation.getParam('user', {}))
       .then(user => user.id ? user : appDatabase.getUserData(this.props.navigation.getParam('userId', undefined)))
       .then(user => {
-        if (!user) throw this.setState({ isReady: true });
+        if (!user) throw this.setState({ isReady: true, user: undefined });
         this.props.navigation.setParams({ user });
         this.setState({ user, posts: [], isReady: true });
         return appDatabase.getUsersPosts(user);
@@ -62,16 +62,22 @@ export class ProfileScreen extends React.Component {
 }
 
 class ProfileLayout extends React.Component {
-  render = () => <View style={{ flex: 1 }}>
-    <Image source={this.props.user.avatarSource} style={styles.coverImage} blurRadius={20} />
-    <FlatList
-      data={this.props.posts}
-      numColumns={3}
-      ListHeaderComponent={<UserProfile {...this.props} />}
-      renderItem={({ item }) => <MiniPost {...this.props} post={item} />}
-      bouncesZoom={true}
-    />
-  </View>
+  render = () => !this.props.user ? (
+    <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+      <Text style={{ fontSize: 20 }}>User not found.</Text>
+    </View>
+  ) : (
+      <View style={{ flex: 1 }}>
+        <Image source={this.props.user.avatarSource} style={styles.coverImage} blurRadius={20} />
+        <FlatList
+          data={this.props.posts}
+          numColumns={3}
+          ListHeaderComponent={<UserProfile {...this.props} />}
+          renderItem={({ item }) => <MiniPost {...this.props} post={item} />}
+          bouncesZoom={true}
+        />
+      </View>
+    );
 }
 
 class UserProfile extends React.Component {
