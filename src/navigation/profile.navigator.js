@@ -3,14 +3,15 @@ import { createStackNavigator } from 'react-navigation-stack';
 
 import defaultNavigationOptions from './defaultNavOpts';
 
-import { ProfileScreen } from '../screens/Screens';
+import { ProfileScreen, SinglePostScreen, PersonalProfileScreen } from '../screens/Screens';
 
-const ProfileNavigator = createStackNavigator(
-	{
-		ProfileScreen: { screen: ProfileScreen }
-	}, {
-		initialRouteName: 'ProfileScreen',
-		defaultNavigationOptions
+const ProfileNavigator = createStackNavigator({
+	PersonalProfileScreen,
+	ProfileScreen,
+	SinglePostScreen
+}, {
+	initialRouteName: 'PersonalProfileScreen',
+	...defaultNavigationOptions
 })
 
 

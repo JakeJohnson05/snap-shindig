@@ -1,10 +1,10 @@
 import React from 'react';
 import { StyleSheet, View, Text, TextInput, Button } from 'react-native';
 
-import COLORS from 'snapshindig/assets/colors';
 import { auth } from '../../../firebaseConfig';
 
-import SnapShindigLogo from 'snapshindig/src/components/logo';
+import COLORS from 'snapshindig/assets/colors';
+import { SnapShindigLogo } from 'snapshindig/src/components/components';
 
 export class RegisterScreen extends React.Component {
 	static navigationOptions = { title: 'Sign Up' }

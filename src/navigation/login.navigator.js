@@ -5,13 +5,12 @@ import defaultNavigationOptions from './defaultNavOpts';
 
 import { LoginScreen, RegisterScreen } from '../screens/Screens';
 
-const LoginNavigator = createStackNavigator(
-	{
-		Login: { screen: LoginScreen },
-		Register: { screen: RegisterScreen }
-	}, {
+const LoginNavigator = createStackNavigator({
+	Login: LoginScreen,
+	Register: RegisterScreen
+}, {
 	initialRouteName: 'Login',
-	defaultNavigationOptions
+	...defaultNavigationOptions
 })
 
 

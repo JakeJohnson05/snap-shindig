@@ -1,33 +1,35 @@
 import React from 'react';
-import { StyleSheet, Text, View, Image, Dimensions } from 'react-native';
+import { StyleSheet, Text, View, Image, Dimensions, TouchableOpacity } from 'react-native';
 
 import COLORS from 'snapshindig/assets/colors';
 
 export class PostComponent extends React.Component {
-  render = () => (
-    <View style={styles.post}>
-      {!this.props.hideHeader && this.props.data.user && <PostHeader user={this.props.data.user} />}
+  render = () => <View style={styles.post}>
+    {!this.props.hideHeader && this.props.data.user && <PostHeader {...this.props} user={this.props.data.user} />}
 
-      <Image source={this.props.data.imageSource} style={styles.image} />
-      
-      <View>
-        <Text>{this.props.data.caption}</Text>
-      </View>
+    <Image source={this.props.data.imageSource} style={styles.image} />
 
+    <View>
+      <Text>{this.props.data.caption}</Text>
     </View>
-  );
+
+  </View>;
 }
 
-export const PostHeader = ({ user }) => (
-  <View style={styles.header}>
+export class PostHeader extends React.Component {
+  render = () => <View style={styles.header}>
     <View style={styles.userImage}>
-      <Image source={user.avatarSource} style={styles.userImage} />
+      <TouchableOpacity onPress={() => this.props.navigation.push('ProfileScreen', { userId: this.props.user.id, user: this.props.user })}>
+        <Image source={this.props.user.avatarSource} style={styles.userImage} />
+      </TouchableOpacity>
     </View>
     <View style={styles.username}>
-      <Text>{user.username}</Text>
+      <TouchableOpacity onPress={() => this.props.navigation.push('ProfileScreen', { userId: this.props.user.id, user: this.props.user })}>
+        <Text>{this.props.user.username}</Text>
+      </TouchableOpacity>
     </View>
-  </View>
-);
+  </View>;
+}
 
 const styles = StyleSheet.create({
   post: {

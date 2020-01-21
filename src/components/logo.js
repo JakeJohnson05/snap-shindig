@@ -3,7 +3,7 @@ import { StyleSheet, Text, View } from 'react-native';
 
 import COLORS from 'snapshindig/assets/colors';
 
-export default class SnapShindigLogo extends React.Component {
+export class SnapShindigLogo extends React.Component {
 	render = () => (
 		<View>
 			<View style={styles.logoContainer}>

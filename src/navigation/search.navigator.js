@@ -3,14 +3,15 @@ import { createStackNavigator } from 'react-navigation-stack';
 
 import defaultNavigationOptions from './defaultNavOpts';
 
-import { SearchScreen } from '../screens/Screens';
+import { SearchScreen, ProfileScreen, SinglePostScreen } from '../screens/Screens';
 
-const SearchNavigator = createStackNavigator(
-	{
-		SearchScreen: { screen: SearchScreen }
-	}, {
+const SearchNavigator = createStackNavigator({
+	SearchScreen,
+	ProfileScreen,
+	SinglePostScreen
+}, {
 	initialRouteName: 'SearchScreen',
-	defaultNavigationOptions
+	...defaultNavigationOptions
 })
 
 

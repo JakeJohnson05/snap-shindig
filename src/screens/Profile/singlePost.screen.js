@@ -1,19 +1,18 @@
 import React from 'react';
-import { View } from 'react-native';
+import { View, Text } from 'react-native';
 
-import { appDatabase, Post } from '../../../firebaseConfig';
+import { PostComponent } from 'snapshindig/src/components/components';
 
-import { PostComponent } from 'snapshindig/src/components/post';
-
-export class HomeScreen extends React.Component {
+export class SinglePostScreen extends React.Component {
 	static navigationOptions = { title: 'Snap Shindig', headerBackTitle: 'Back', headerTruncatedBackTitle: 'Back' }
 	state = { post: undefined };
 
-	render = () => (
-		<View style={{ flex: 1 }}>
-			<PostComponent data={this.state.post} />
-		</View>
-	);
-
-	componentDidMount = () => appDatabase.getPost(this.props.navigation.getParam('postId', undefined)).then(post => this.setState({ post }));
+	render = () => {
+		const post = this.props.navigation.getParam('post', undefined);
+		return post ? <PostComponent data={post} /> : (
+			<View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+				<Text style={{ fontSize: 20 }}>Post not found.</Text>
+			</View>
+		);
+	}
 }

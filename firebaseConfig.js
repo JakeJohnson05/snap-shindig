@@ -59,13 +59,13 @@ class FirebaseApp {
 	 * @return {Promise<User>} User matching id else null
 	 */
 	getUserData = async userId => {
-		if (!userId) return null;
+		if (!userId) return undefined;
 		// Check if the user has already been requested
 		let user = this.usersBS.value.find(({ id }) => id === userId);
 		// If no previous User found. Make request to database
 		if (!user) {
 			user = await users.doc(userId).get();
-			if (!user.exists) return null;
+			if (!user.exists) return undefined;
 			user = Object.assign({ id: user.id }, user.data());
 
 			// Add the users avatar uri if avatar path exists
@@ -184,6 +184,7 @@ export class Post extends Model {
 
 	/** Gets the image for the 'add post' picture */
 	static get addPostImage() { return require('snapshindig/assets/add.png') }
+	static generateAddPost = () => new Post({ key: this.addPostImage, id: 'addPostImagePlaceholder' });
 }
 
 /** The 'createdAt' object in Models */

@@ -1,77 +1,105 @@
 import React from 'react';
-import { Text, View, StyleSheet, FlatList, Image, Dimensions } from 'react-native';
+import { Text, View, StyleSheet, FlatList, Image, Dimensions, TouchableOpacity } from 'react-native';
 
-import { Loading } from 'snapshindig/src/components/loading';
+import { auth, appDatabase, Post } from '../../../firebaseConfig';
 import COLORS from 'snapshindig/assets/colors';
+import { Loading } from 'snapshindig/src/components/components';
 
-import { auth, appDatabase, Post, User } from '../../../firebaseConfig';
-
-export class ProfileScreen extends React.Component {
-  static navigationOptions = ({ navigation }) => ({
-    title: navigation.getParam('username', 'Profile')
-  });
-  /** @type {[key: string]: ReactNativeFiberHostComponent} */
-  inputRefs = {}
-  /** @type {{ user: User; posts: Post[]; }} */
-  state = { user: undefined, posts: undefined }
+export class PersonalProfileScreen extends React.Component {
+  static navigationOptions = ({ navigation }) => ({ title: navigation.getParam('user', { username: 'Profile' }).username.toUpperCase() });
+  state = { user: undefined, posts: undefined, isReady: false }
   /** @type {Function[]} The unsubscribe functions */
   unmountSubscriptions = [];
 
-  render = () => !this.state.user ? <Loading /> : (
-    <View style={{ flex: 1 }}>
-      <Image source={this.state.user.avatarSource} style={styles.coverImage} blurRadius={20} />
-      <FlatList
-        data={this.state.posts}
-        numColumns={3}
-        ListHeaderComponent={<UserProfile user={this.state.user} />}
-        renderItem={({ item: { key } }) => <MiniPost imageSource={key} />}
-        bouncesZoom={true}
-      />
-    </View>
-  );
+  render = () => !this.state.isReady ? <Loading /> : <ProfileLayout {...this.props} user={this.state.user} posts={this.state.posts} />;
 
   componentDidMount = () => this.unmountSubscriptions = [
-    auth.onAuthStateChanged(userSnap => !userSnap ? this.setState({ user: new User(), posts: [] }) : appDatabase.getUserData(userSnap.uid).then(user => {
-      if (!user) throw this.setState({ user: new User(), posts: [] });
-      this.props.navigation.setParams({ username: user.username.toUpperCase() });
-      this.setState({ user, posts: [{ key: Post.addPostImage }] });
+    auth.onAuthStateChanged(userSnap => !userSnap ? this.setState({ isReady: true }) : appDatabase.getUserData(userSnap.uid).then(user => {
+      if (!user) throw this.setState({ isReady: true });
+      this.props.navigation.setParams({ user });
+      this.setState({ user, posts: [Post.generateAddPost()], isReady: true });
       return appDatabase.getUsersPosts(user);
     }).then(posts => posts.sort(Post.sortByDate)).then(posts => this._loadPosts(posts))
-      .catch(err => console.error('ProfileScreen.componentDidMount: ' + JSON.stringify(err))))
+      .catch(err => err instanceof Error && console.error('PersonalProfileScreen.componentDidMount: ' + JSON.stringify(err))))
   ];
 
   /** @param {Post[]} posts */
   async _loadPosts(posts) {
     for (let post of posts) {
       await post.keyDownload();
-      this.setState(prevState => ({
-        posts: [...prevState.posts, post]
-      }));
+      this.setState(prevState => ({ posts: [...prevState.posts, post] }));
     }
   }
-  
+
   componentWillUnmount = () => this.unmountSubscriptions.forEach(unsubscribe => unsubscribe());
 }
 
-const MiniPost = ({ imageSource }) => <Image source={imageSource} style={styles.miniImage} />;
-/** @param {{user: User}} */
-const UserProfile = ({ user }) => (
-  <View>
-    <View style={styles.whiteBgOverlay}>
-      <View style={{ width: '100%', height: 1, backgroundColor: COLORS.grayLight, shadowColor: '#000', shadowOpacity: 1, shadowRadius: 3, shadowOffset: { height: 1, width: 0 } }}></View>
-    </View>
+export class ProfileScreen extends React.Component {
+  static navigationOptions = ({ navigation }) => ({ title: navigation.getParam('user', { username: 'Profile' }).username.toUpperCase() });
+  state = { user: undefined, posts: undefined, isReady: false }
 
-    <View style={styles.profileContainer}>
+  render = () => !this.state.isReady ? <Loading /> : <ProfileLayout {...this.props} user={this.state.user} posts={this.state.posts} />;
 
-      <View style={styles.profileTopRow}>
-        <Image source={user.avatarSource} style={styles.userImage} />
-        <Text style={styles.name}>{user.name}</Text>
-        <Text style={styles.bio}>{user.bio}</Text>
-      </View>
+  componentDidMount() {
+    Promise.resolve(this.props.navigation.getParam('user', undefined))
+      .then(user => user.id ? user : appDatabase.getUserData(this.props.navigation.getParam('userId', undefined)))
+      .then(user => {
+        if (!user) throw this.setState({ isReady: true });
+        this.props.navigation.setParams({ user });
+        this.setState({ user, posts: [], isReady: true });
+        return appDatabase.getUsersPosts(user);
+      }).then(posts => posts.sort(Post.sortByDate)).then(posts => this._loadPosts(posts))
+      .catch(err => err instanceof Error && console.error('ProfileScreen.componentDidMount: ' + JSON.stringify(err)))
+  }
 
-    </View>
+  /** @param {Post[]} posts */
+  async _loadPosts(posts) {
+    for (let post of posts) {
+      await post.keyDownload();
+      this.setState(prevState => ({ posts: [...prevState.posts, post] }));
+    }
+  }
+}
+
+class ProfileLayout extends React.Component {
+  render = () => <View style={{ flex: 1 }}>
+    <Image source={this.props.user.avatarSource} style={styles.coverImage} blurRadius={20} />
+    <FlatList
+      data={this.props.posts}
+      numColumns={3}
+      ListHeaderComponent={<UserProfile {...this.props} />}
+      renderItem={({ item }) => <MiniPost {...this.props} post={item} />}
+      bouncesZoom={true}
+    />
   </View>
-);
+}
+
+class UserProfile extends React.Component {
+  render = () => <View>
+    <View style={styles.whiteBgOverlay}>
+      {/* <View style={{ width: '100%', height: 1, backgroundColor: COLORS.grayLight, shadowColor: '#000', shadowOpacity: 1, shadowRadius: 3, shadowOffset: { height: 1, width: 0 } }}></View> */}
+    </View>
+    <View style={styles.profileContainer}>
+      <View style={styles.profileTopRow}>
+        <Image source={this.props.user.avatarSource} style={styles.userImage} />
+        <Text style={styles.name}>{this.props.user.name}</Text>
+        <Text style={styles.bio}>{this.props.user.bio}</Text>
+      </View>
+    </View>
+  </View>;
+}
+
+class MiniPost extends React.Component {
+  render = () => {
+    const { post, navigation } = this.props;
+    if (post.id === 'addPostImagePlaceholder') return <Image source={post.imageSource} style={styles.miniImage} />;
+    return (
+      <TouchableOpacity onPress={() => navigation.push('SinglePostScreen', { post })}>
+        <Image source={post.imageSource} style={styles.miniImage} />
+      </TouchableOpacity>
+    );
+  }
+}
 
 const superNumber = 2.5;
 
@@ -102,11 +130,10 @@ const styles = StyleSheet.create({
     borderRadius: Dimensions.get('window').width / (superNumber * 2),
     borderWidth: 2,
     borderColor: COLORS.grayVeryLight,
-    alignSelf: "center"
-
+    alignSelf: 'center'
   },
   name: {
-    marginHorizontal: 30,
+    marginHorizontal: 20,
     fontSize: 20
   },
   bio: {

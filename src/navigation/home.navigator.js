@@ -3,14 +3,15 @@ import { createStackNavigator } from 'react-navigation-stack';
 
 import defaultNavigationOptions from './defaultNavOpts';
 
-import { HomeScreen } from '../screens/Screens';
+import { HomeScreen, ProfileScreen, SinglePostScreen } from '../screens/Screens';
 
-const HomeNavigator = createStackNavigator(
-	{
-		HomeScreen: { screen: HomeScreen }
-	}, {
+const HomeNavigator = createStackNavigator({
+	HomeScreen,
+	ProfileScreen,
+	SinglePostScreen
+}, {
 	initialRouteName: 'HomeScreen',
-	defaultNavigationOptions
+	...defaultNavigationOptions
 })
 
 

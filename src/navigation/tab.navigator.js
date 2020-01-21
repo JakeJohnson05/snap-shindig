@@ -11,15 +11,13 @@ import HomeStack from './home.navigator';
 import SearchStack from './search.navigator';
 
 /** Stores the icons for each of the route names */
-const iconRefs = { Search: 'search1', Profile: 'user', Home: 'home' }
+const iconRefs = { SearchStack: 'search1', ProfileStack: 'user', HomeStack: 'home' }
 
 /** The navigator for the bottom tab which is constantly visible  */
 const BottomTabNavigator = createBottomTabNavigator({
-  Search: { screen: SearchStack },
-  Home: { screen: HomeStack },
-  Profile: { screen: ProfileStack }
+  SearchStack, HomeStack, ProfileStack
 }, {
-  initialRouteName: 'Profile' || 'Home',
+  initialRouteName: 'HomeStack',
   defaultNavigationOptions: ({ navigation }) => ({
     tabBarIcon: ({ tintColor }) => <BottomTabBarIcon route={navigation.state.routeName} color={tintColor} />
   }),

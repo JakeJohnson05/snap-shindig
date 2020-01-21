@@ -1,11 +1,11 @@
 import React from 'react';
 import { StyleSheet, View, Text, TextInput, Button } from 'react-native';
 
-import ENV_VARS from '../../../env';
-import COLORS from 'snapshindig/assets/colors';
 import { auth } from 'snapshindig/firebaseConfig';
+import ENV_VARS from '../../../env';
 
-import SnapShindigLogo from 'snapshindig/src/components/logo';
+import COLORS from 'snapshindig/assets/colors';
+import { SnapShindigLogo } from 'snapshindig/src/components/components';
 
 export class LoginScreen extends React.Component {
 	static navigationOptions = { title: 'Log In', headerBackTitle: 'Log In', headerTruncatedBackTitle: 'Log In' }
