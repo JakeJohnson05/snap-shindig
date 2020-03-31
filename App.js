@@ -3,7 +3,7 @@ import { StyleSheet, View, Platform, StatusBar } from 'react-native';
 import { Asset } from 'expo-asset';
 import { AppLoading } from 'expo';
 import * as Font from 'expo-font';
-import { AntDesign } from '@expo/vector-icons';
+import { AntDesign } from '@expo/vector-icons'; 
 
 import { auth } from './firebaseConfig';
 
